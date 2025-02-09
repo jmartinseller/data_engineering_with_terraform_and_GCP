@@ -1,6 +1,6 @@
 terraform {
     backend "gcs" { 
-      bucket  = "tf-state-gh-cicdproject"
+      bucket  = var.backend
       prefix  = "prod"
     }
 }
