@@ -17,7 +17,7 @@ resource "google_bigquery_table" "tb_leads_sales" {
   project = var.data-project
   dataset_id = google_bigquery_dataset.raw_uncover.dataset_id
   table_id  = "tb_leads_sales"
-  schema = file("terraform\\schemas\\tb_leads_sales.json")
+  schema = file("terraform/schemas/tb_leads_sales.json")
 
   labels = local.labels
 
@@ -34,7 +34,7 @@ resource "google_bigquery_table" "tb_tv_radio_influencers" {
   project = var.data-project
   dataset_id = google_bigquery_dataset.raw_uncover.dataset_id
   table_id  = "tb_tv_radio_influencers"
-  schema = file("terraform\\schemas\\tb_tv_radio_influencers.json")
+  schema = file("terraform/schemas/tb_tv_radio_influencers.json")
 
   labels = local.labels
 
