@@ -7,6 +7,7 @@ resource "google_bigquery_dataset" "raw_uncover" {
   dataset_id = "raw_uncover"
   description = "Dataset contendo dados brutos sem nenhuma transformação"
   labels = local.labels
+  location  = var.region
 }
 
 
@@ -19,7 +20,7 @@ resource "google_bigquery_table" "tb_leads_sales" {
   dataset_id = google_bigquery_dataset.raw_uncover.dataset_id
   table_id  = "tb_leads_sales"
   schema = file("terraform/schemas/tb_leads_sales.json")
-
+  location  = var.region
   labels = local.labels
 
  external_data_configuration {
@@ -36,7 +37,7 @@ resource "google_bigquery_table" "tb_tv_radio_influencers" {
   dataset_id = google_bigquery_dataset.raw_uncover.dataset_id
   table_id  = "tb_tv_radio_influencers"
   schema = file("terraform/schemas/tb_tv_radio_influencers.json")
-
+  location  = var.region
   labels = local.labels
 
  external_data_configuration {
