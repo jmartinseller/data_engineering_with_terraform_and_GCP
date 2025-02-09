@@ -1,6 +1,6 @@
 terraform {
     backend "gcs" { 
-      bucket  = var.backend
+      bucket  = var.bk_backend
       prefix  = "prod"
     }
 }
