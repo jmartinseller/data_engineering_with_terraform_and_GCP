@@ -1,0 +1,27 @@
+[
+  {
+    "name": "date",
+    "type": "Date",
+    "description": null
+  },
+  {
+    "name": "channel",
+    "type": "STRING",
+    "description": null
+  },
+  {
+    "name": "vehicle",
+    "type": "STRING",
+    "description": null
+  },
+  {
+    "name": "campaign",
+    "type": "INTEGER",
+    "description": null
+  },
+  {
+    "name": "spent",
+    "type": "FLOAT",
+    "description": null
+  } 
+]

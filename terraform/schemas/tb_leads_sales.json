@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Date",
+    "type": "Date",
+    "description": null
+  },
+  {
+    "name": "State",
+    "type": "STRING",
+    "description": null
+  },
+  {
+    "name": "Product",
+    "type": "STRING",
+    "description": null
+  },
+  {
+    "name": "Leads",
+    "type": "INTEGER",
+    "description": null
+  },
+  {
+    "name": "Qualified_Leads",
+    "type": "INTEGER",
+    "description": null
+  },
+  {
+    "name": "Sales",
+    "type": "INTEGER",
+    "description": null
+  },
+  {
+    "name": "Price",
+    "type": "FLOAT",
+    "description": null
+  }
+  
+]
