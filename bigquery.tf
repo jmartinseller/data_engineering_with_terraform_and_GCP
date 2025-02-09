@@ -25,14 +25,14 @@ resource "google_bigquery_table" "tb_leads_sales" {
    autodetect    = true
    source_format = "parquet" #O formato dos arquivos
    source_uris = [
-     "gs://${local.bk_parquet}/leads_sales.parquet",
+     "gs://${var.bk_parquet}/leads_sales.parquet",
    ]
  }
 }
 
 resource "google_bigquery_table" "tb_tv_radio_influencers" {
   project = var.data-project
-  dataset_id = google_bigquery_dataset.jove.dataset_id
+  dataset_id = google_bigquery_dataset.raw_uncover.dataset_id
   table_id  = "tb_tv_radio_influencers"
   schema = file("terraform\\schemas\\tb_tv_radio_influencers.json")
 
@@ -49,7 +49,7 @@ resource "google_bigquery_table" "tb_tv_radio_influencers" {
    }
 
    source_uris = [
-     "gs://${local.bk_csv}/*.csv",
+     "gs://${var.bk_csv}/*.csv",
    ]
  }
 }

@@ -83,7 +83,6 @@ jobs:
         region="${{ vars.GCP_REGION }}" 
         project="${{ vars.GCP_PROJECT }}" 
         data-project="${{ vars.GCP_DATA_PROJECT }}"
-        bk_backend="${{ vars.BK_BACKEND }}"
         bk_csv="${{ vars.BK_CSV }}"
         bk_parquet="${{ vars.BK_PARQUET}}"
         EOF
