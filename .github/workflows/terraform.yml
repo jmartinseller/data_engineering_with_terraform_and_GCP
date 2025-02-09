@@ -85,7 +85,7 @@ jobs:
         data-project="${{ vars.GCP_DATA_PROJECT }}"
         EOF
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: terraform init
       env:
