@@ -3,6 +3,7 @@
 ####################################################################################################
 
 resource "google_bigquery_dataset" "raw_uncover" {
+  project = var.data-project
   dataset_id = "raw_uncover"
   description = "Dataset contendo dados brutos sem nenhuma transformação"
   labels = local.labels
