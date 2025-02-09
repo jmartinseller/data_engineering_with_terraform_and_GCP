@@ -23,7 +23,7 @@ resource "google_bigquery_table" "tb_leads_sales" {
 
  external_data_configuration {
    autodetect    = true
-   source_format = "parquet" #O formato dos arquivos
+   source_format = "PARQUET" #O formato dos arquivos
    source_uris = [
      "gs://${var.bk_parquet}/leads_sales.parquet",
    ]
