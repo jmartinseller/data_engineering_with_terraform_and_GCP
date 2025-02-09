@@ -2,16 +2,9 @@
 # Datasets
 ####################################################################################################
 
-resource "google_bigquery_dataset" "stg_dash_audiencia" {
-  project = var.data-project
-  dataset_id = "teste"
-  description = "Dados stg com origem no GA4 de Audiencia"
+resource "google_bigquery_dataset" "dataset" {
+  dataset_id                  = "example_dataset"
+  friendly_name               = "test"
+  description                 = "This is a test description"
   labels = local.labels
-  access {
-    role = "OWNER"
-    group_by_email = "GCP-Administrators-${data-project}@g.globo"  # !!!!ATENCAO!!!!! sempre adicionar esse acesso com lifecycle habilitado
-  }
-  lifecycle {
-    ignore_changes = [ access ] 
-  }
 }
