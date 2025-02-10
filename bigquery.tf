@@ -58,7 +58,7 @@ resource "google_bigquery_table" "tb_public_test_crm_email" {
   project = var.project
   dataset_id = google_bigquery_dataset.raw_uncover.dataset_id
   table_id  = "tb_public_test_crm_email"
-  schema = file("terraform/schemas/tb_public_test_crm_email.json")
+  schema = file("terraform/schemas/tb_public_test_crm.json")
   labels = local.labels
 
   external_data_configuration {
