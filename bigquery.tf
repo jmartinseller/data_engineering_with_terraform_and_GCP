@@ -1,5 +1,5 @@
 ####################################################################################################
-# Datasets
+# Datasets camada raw
 ####################################################################################################
 
 resource "google_bigquery_dataset" "raw_uncover" {
@@ -12,7 +12,7 @@ resource "google_bigquery_dataset" "raw_uncover" {
 
 
 ####################################################################################################
-# Tabelas Externas
+# Tabelas camada raw
 ####################################################################################################
 
 resource "google_bigquery_table" "tb_leads_sales" {
@@ -96,4 +96,53 @@ resource "google_bigquery_table" "tb_public_test_crm_sms" {
       "https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=1135476145#gid=1135476145",
     ]
   }
+}
+
+####################################################################################################
+# Datasets camada prep
+####################################################################################################
+
+resource "google_bigquery_dataset" "prep_uncover" {
+  project = var.project
+  dataset_id = "prep_uncover"
+  description = "Dataset contendo dados Prontos para serem usados"
+  labels = local.labels
+  location  = var.region
+}
+
+
+####################################################################################################
+# Tabelas camada prep
+####################################################################################################
+
+resource "google_bigquery_table" "tb_leads_sales" {
+  project = var.project
+  dataset_id = google_bigquery_dataset.prep_uncover.dataset_id
+  table_id  = "tb_leads_sales"
+  schema = file("terraform/schemas/tb_leads_sales.json")
+  labels = local.labels
+}
+
+resource "google_bigquery_table" "tb_tv_radio_influencers" {
+  project = var.project
+  dataset_id = google_bigquery_dataset.prep_uncover.dataset_id
+  table_id  = "tb_tv_radio_influencers"
+  schema = file("terraform/schemas/tb_tv_radio_influencers.json")
+  labels = local.labels
+}
+
+resource "google_bigquery_table" "tb_public_test_crm_email" {
+  project = var.project
+  dataset_id = google_bigquery_dataset.prep_uncover.dataset_id
+  table_id  = "tb_public_test_crm_email"
+  schema = file("terraform/schemas/tb_public_test_crm.json")
+  labels = local.labels
+}
+
+resource "google_bigquery_table" "tb_public_test_crm_sms" {
+  project = var.project
+  dataset_id = google_bigquery_dataset.prep_uncover.dataset_id
+  table_id  = "tb_public_test_crm_sms"
+  schema = file("terraform/schemas/tb_public_test_crm.json")
+  labels = local.labels
 }
