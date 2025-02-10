@@ -67,6 +67,7 @@ resource "google_bigquery_table" "tb_public_test_crm_email" {
 
     google_sheets_options {
       skip_leading_rows = 1
+      range = "email!A:C"
     }
 
     source_uris = [
@@ -88,6 +89,7 @@ resource "google_bigquery_table" "tb_public_test_crm_sms" {
 
     google_sheets_options {
       skip_leading_rows = 1
+      range = "sms!A:C"
     }
 
     source_uris = [
