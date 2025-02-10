@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Date",
+    "type": "Date",
+    "description": null
+  },
+  {
+    "name": "State",
+    "type": "STRING",
+    "description": null
+  },
+  {
+    "name": "Count",
+    "type": "INTEGER",
+    "description": null
+  }
+]
