@@ -2,8 +2,8 @@
 # Bucket para conter os códigos das cloudfunctions, dataprocs, etc
 ####################################################################################################
 
-resource "google_storage_bucket" "codigos" {
-  name = "codigos"
+resource "google_storage_bucket" "codigos_jw" {
+  name = "codigos_jw"
   uniform_bucket_level_access = true
   labels = local.labels
   location = var.region
@@ -14,8 +14,8 @@ resource "google_storage_bucket" "codigos" {
 # Bucket para conter os arquivos temporários do dataproc
 ####################################################################################################
 
-resource "google_storage_bucket" "tmp-dataproc" {
-  name = "tmp-dataproc"
+resource "google_storage_bucket" "tmp_dataproc_jw" {
+  name = "tmp_dataproc_jw"
   uniform_bucket_level_access = true
   labels = local.labels
   location = var.region

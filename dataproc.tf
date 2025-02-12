@@ -2,7 +2,7 @@
 # Transfere o código do dataproc para o bucket de codigos
 ####################################################################################################
 
-resource "google_storage_bucket_object" "dataproc-code" {
+resource "google_storage_bucket_object" "dataproc_jw" {
   for_each = fileset("../codigo", "**/*")
 
   name = "dataproc/${each.value}"
