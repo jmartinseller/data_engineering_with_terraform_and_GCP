@@ -6,7 +6,7 @@ resource "google_storage_bucket_object" "dataproc_jw" {
   for_each = fileset("../codigo", "**/*")
 
   name = "dataproc/${each.value}"
-  bucket = google_storage_bucket.codigos.name
+  bucket = google_storage_bucket.codigos_jw.name
   source = "../codigo/${each.value}"
 }
 
