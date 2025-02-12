@@ -24,6 +24,7 @@ raw_df = spark.read \
 raw_df.write \
     .format("bigquery") \
     .option("table", "prep_uncover.tb_prep_public_test_crm_sms") \
+    .option("temporaryGcsBucket", "gs://tmp_dataproc_jw") \
     .mode("overwrite") \
     .save()
 
