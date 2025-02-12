@@ -1,10 +1,9 @@
-from pyspark.sql import SparkSession
 import gspread
-import pandas as pd
-from google.auth import default
+from pyspark.sql import SparkSession
 
-# Obtém credenciais padrão do GCP
-credentials, project = default()
+# Configurações do Google Sheets
+SHEET_URL = 'https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0'
+SHEET_NAME = 'sms'
 
 # Criação da SparkSession
 spark = SparkSession.builder \
@@ -16,22 +15,20 @@ spark = SparkSession.builder \
 spark.conf.set("spark.sql.catalog.spark_bigquery", "org.apache.spark.sql.execution.datasources.v2.bigquery.BigQueryCatalog")
 spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")  # Seu projeto no Google Cloud
 
-# A autenticação do Dataproc será feita automaticamente com a conta de serviço do cluster
-client = gspread.authorize(credentials)  # Usando a autenticação automática
+# Abre a planilha pública
+sheet = gspread.open_by_url(SHEET_URL).worksheet(SHEET_NAME)
 
-# Abra a Google Sheet
-spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0")
-worksheet = spreadsheet.sheet1  # Escolha a aba que deseja (sheet1 é a primeira aba)
+# Lê os dados da planilha
+data = sheet.get_all_values()
 
-# Converta os dados da planilha para um DataFrame Pandas
-data = worksheet.get_all_records()  # Pega todos os registros da aba
-df = pd.DataFrame(data)  # Converte para um DataFrame do Pandas
+# Converte os dados para um DataFrame do PySpark
+headers = data[0]  # A primeira linha contém os cabeçalhos
+rows = data[1:]    # As demais linhas contêm os dados
 
-# Converta o DataFrame do Pandas para um DataFrame do Spark
-spark_df = spark.createDataFrame(df)
+df = spark.createDataFrame(rows, schema=headers)
 
 # Gravando os dados na tabela do BigQuery
-spark_df.write \
+df.write \
     .format("bigquery") \
     .option("table", "prep_uncover.tb_prep_public_test_crm_sms") \
     .option("temporaryGcsBucket", "tmp_dataproc_jw") \
