@@ -1,4 +1,7 @@
 from pyspark.sql import SparkSession
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import pandas as pd
 
 # Criação da SparkSession
 spark = SparkSession.builder \
@@ -8,17 +11,24 @@ spark = SparkSession.builder \
 
 # Configuração do BigQuery
 spark.conf.set("spark.sql.catalog.spark_bigquery", "org.apache.spark.sql.execution.datasources.v2.bigquery.BigQueryCatalog")
-spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")  # Substitua pelo ID do seu projeto
+spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")  # Seu projeto no Google Cloud
 
-# Leitura da tabela tb_raw_leads_sales no dataset raw_uncover
-raw_df = spark.read \
-    .format("bigquery") \
-    .option("table", "raw_uncover.tb_raw_public_test_crm_sms") \
-    .load()
+# A autenticação do Dataproc será feita automaticamente com a conta de serviço do cluster
+client = gspread.authorize(None)  # Usando a autenticação automática
 
+# Abra a Google Sheet
+spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0")
+worksheet = spreadsheet.sheet1  # Escolha a aba que deseja (sheet1 é a primeira aba)
 
-# Gravando os dados na tabela tb_prep_leads_sales no dataset prep_uncover
-raw_df.write \
+# Converta os dados da planilha para um DataFrame Pandas
+data = worksheet.get_all_records()  # Pega todos os registros da aba
+df = pd.DataFrame(data)  # Converte para um DataFrame do Pandas
+
+# Converta o DataFrame do Pandas para um DataFrame do Spark
+spark_df = spark.createDataFrame(df)
+
+# Gravando os dados na tabela do BigQuery
+spark_df.write \
     .format("bigquery") \
     .option("table", "prep_uncover.tb_prep_public_test_crm_sms") \
     .option("temporaryGcsBucket", "tmp_dataproc_jw") \

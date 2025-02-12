@@ -12,9 +12,9 @@ spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")
 
 # Leitura da tabela tb_raw_leads_sales no dataset raw_uncover
 raw_df = spark.read \
-    .format("bigquery") \
-    .option("table", "raw_uncover.tb_raw_tv_radio_influencers") \
-    .load()
+    .format("csv") \
+    .option("header", "true") \
+    .load("gs://tv_radio_influencers_files/*.csv")
 
 
 # Gravando os dados na tabela tb_prep_leads_sales no dataset prep_uncover
