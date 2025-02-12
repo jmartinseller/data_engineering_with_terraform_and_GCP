@@ -7,7 +7,7 @@ resource "google_cloud_scheduler_job" "daily_trigger" {
   time_zone = "America/Sao_Paulo"
 
   http_target {
-    uri = "https://dataproc.googleapis.com/v1/projects/${var.project}/regions/us-central1/workflowTemplates/${google_dataproc_workflow_template.dataproc-jw.name}:instantiate"
+    uri = "https://dataproc.googleapis.com/v1/projects/${var.project}/regions/us-east1/workflowTemplates/${google_dataproc_workflow_template.dataproc-jw.name}:instantiate"
     http_method = "POST"
 
       oauth_token {

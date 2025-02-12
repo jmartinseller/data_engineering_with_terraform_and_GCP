@@ -16,7 +16,7 @@ resource "google_storage_bucket_object" "dataproc_jw" {
 
 resource "google_dataproc_workflow_template" "dataproc-jw" {
   name     = "dataproc-daily-execution"
-  location = "us-central1"
+  location = "us-east1"
   
   placement {
     managed_cluster {
@@ -33,7 +33,7 @@ resource "google_dataproc_workflow_template" "dataproc-jw" {
         }
 
         gce_cluster_config {
-          zone             = "us-central1-a"
+          zone             = "us-east1"
           internal_ip_only = true
           service_account_scopes = [
             "https://www.googleapis.com/auth/cloud-platform"
