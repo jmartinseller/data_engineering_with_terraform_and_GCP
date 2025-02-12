@@ -9,5 +9,9 @@ resource "google_cloud_scheduler_job" "daily_trigger" {
   http_target {
     uri = "https://dataproc.googleapis.com/v1/projects/${var.project}/regions/us-central1/workflowTemplates/${google_dataproc_workflow_template.dataproc-jw.name}:instantiate"
     http_method = "POST"
+
+      oauth_token {
+      service_account_email = "tfsa-942@aprendizado-450314.iam.gserviceaccount.com"
+    }
   }
 }
