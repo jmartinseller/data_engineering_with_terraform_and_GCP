@@ -3,9 +3,8 @@
 ####################################################################################################
 
 resource "google_storage_bucket_object" "dataproc_jw" {
-  for_each = fileset("../codigo", "*")
-
-  name = "dataproc/${each.value}"
+  for_each = fileset("${path.module}/codigo", "*")
+  name = "${each.value}"
   bucket = google_storage_bucket.codigos_jw.name
-  source = "../codigo/${each.value}"
+  source = "${path.module}/codigo/${each.value}"
 }
