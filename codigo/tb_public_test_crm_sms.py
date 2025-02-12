@@ -1,6 +1,10 @@
 from pyspark.sql import SparkSession
 import gspread
 import pandas as pd
+from google.auth import default
+
+# Obtém credenciais padrão do GCP
+credentials, project = default()
 
 # Criação da SparkSession
 spark = SparkSession.builder \
@@ -13,7 +17,7 @@ spark.conf.set("spark.sql.catalog.spark_bigquery", "org.apache.spark.sql.executi
 spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")  # Seu projeto no Google Cloud
 
 # A autenticação do Dataproc será feita automaticamente com a conta de serviço do cluster
-client = gspread.authorize(None)  # Usando a autenticação automática
+client = gspread.authorize(credentials)  # Usando a autenticação automática
 
 # Abra a Google Sheet
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0")
