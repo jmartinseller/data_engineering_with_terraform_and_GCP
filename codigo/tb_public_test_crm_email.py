@@ -1,9 +1,8 @@
 from pyspark.sql import SparkSession
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
-import subprocess
 
-# 🔹 Instalação das dependências no job
-subprocess.run(["pip", "install", "gspread", "oauth2client"])
 
 # Criação da SparkSession
 spark = SparkSession.builder \

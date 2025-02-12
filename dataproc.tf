@@ -24,6 +24,9 @@ resource "google_dataproc_workflow_template" "dataproc-jw" {
       config {
         staging_bucket = google_storage_bucket.tmp_dataproc_jw.name
         temp_bucket    = google_storage_bucket.tmp_dataproc_jw.name
+        initialization_actions {
+          executable_file = "gs://${google_storage_bucket.codigos_jw.name}/dependencia.sh"
+        }
 
         software_config {
           image_version = "2.2-debian11"
@@ -48,7 +51,8 @@ resource "google_dataproc_workflow_template" "dataproc-jw" {
             boot_disk_type    = "pd-standard"
             boot_disk_size_gb = 30
           }
-        }
+        } 
+        
       }
     }
   }
