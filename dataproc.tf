@@ -22,8 +22,8 @@ resource "google_dataproc_workflow_template" "dataproc_jw" {
     managed_cluster {
       cluster_name = "dataproc-jw-temp"
       config {
-        staging_bucket = google_storage_bucket.tmp-dataproc.name
-        temp_bucket    = google_storage_bucket.tmp-dataproc.name
+        staging_bucket = google_storage_bucket.tmp_dataproc_jw.name
+        temp_bucket    = google_storage_bucket.tmp_dataproc_jwc.name
 
         gce_cluster_config {
           internal_ip_only = true
