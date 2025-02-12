@@ -33,7 +33,7 @@ resource "google_dataproc_workflow_template" "dataproc-jw" {
         }
 
         gce_cluster_config {
-          zone             = "us-east1-b"
+          zone             = "us-east1-d"
           internal_ip_only = true
           service_account_scopes = [
             "https://www.googleapis.com/auth/cloud-platform"
