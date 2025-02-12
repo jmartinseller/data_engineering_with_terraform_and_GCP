@@ -28,7 +28,7 @@ resource "google_dataproc_workflow_template" "dataproc-jw" {
         software_config {
           image_version = "2.2-debian11"
           properties = {
-            "spark:spark.jars.packages" = "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.42.0"
+            "spark:spark.jars" = "gs://dependencia_pyspark/spark-bigquery-with-dependencies_2.13-0.42.0.jar"
           }
         }
 

@@ -9,33 +9,33 @@ Este projeto consiste em centralizar os dados de 3 fontes diferentes em um ambie
 - Planilhas do Google Sheets
 
 ## Arquitetura da Solução
-Vizando construir uma solução simples e robusta,iremos utilizar os recursos do Google Cloud Platform (GCP). Essa escolha se deve ao fato de que o GCP conta com dezenas de recursos que possibilitam criar um pipeline de dados simples, robusto e escalavel. Todo provisionamento e gerenciamento da infraestrutura no GCP será realizada via Terraform. Integrando o Terraform ao github teremos um projeto com criação de recursos de forma automatizada, versionavel, com redução do trabalho manual e a possibilidade de fazer rollback de versões anteriores do projeto caso necessario.
+Visando construir uma solução simples e robusta,utilizaremos os recursos do Google Cloud Platform (GCP). Essa escolha se deve ao fato de que o GCP conta com dezenas de recursos que possibilitam criar um pipeline de dados simples, robusto e escalável. Todo o provisionamento e gerenciamento da infraestrutura no GCP será realizada via Terraform. Integrando o Terraform ao GitHub, teremos um projeto com criação de recursos de forma automatizada, versionável, com redução do trabalho manual e a possibilidade de fazer rollback de versões anteriores do projeto caso necessario.
 
 **Desenho da Solução**
 ![alt text](documentacao/Arquiteura_Projeto_Uncover.drawio.png)
 
-**Principais Componetes**
+**Principais Componentes**
 
 - Google Cloud Storage (GCS): Para armazenar os arquivos CSV. A inserção de novos arquivos CSV no bucket deverá ser feita via interface do GCP pelo usúario sempre que necessário. Tambem teremos um bucket para armazenar o arquivo parquet que dá origem a uma tabela no Bigquey.
 - Google Cloud BigQuery: Usado para o armazenamento centralizado dos dados e realização de consultas SQL nesses dados. Usaremos tambem Tabelas Externas para consultar dados diretamente dos buckets e Google Sheets sem carregá-los inicialmente (camada raw) no armazenamento do Bigquey
-- Google Cloud Dataproc: Usado para executar jobs PySpark para extrair, tranformar e carregar os dados no Bigquey.
+- Google Cloud Dataproc: Usado para executar jobs PySpark para extrair, tranformar e carregar os dados no BigQuery. Serão 4 Jobs, cada um responsável por executar o processo em cada tabela.
 - Google Cloud Scheduler: Será usado para agendar a execução dos Jobs pelo Dataproc.
 
 **Fluxo de dados**
 - Arquivos CSV: 
-   - Os arquivos CSV são enviados para um bucket do GCS via interface, sempre que necessário é possivel incluir novos arquivos;
+   - Os arquivos CSV são enviados para um bucket do GCS via interface; sempre que necessário, é possivel incluir novos arquivos.
    - Uma tabela Externa do Bigquey é criada baseada nos arquivos contidos no bucket. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa antes de carregá-los no BigQuery.
+   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa antes de carregá-los no BigQuery.
 
 - Google Sheet: 
-   - Os arquivos do Google Sheet são armazenados em um drive terceiro. O arquivo Google Sheet deve estar com a opção de compartilhamento que possibilite qualquer pessoa com o link da planilha realizar leitura;
+   - Os arquivos do Google Sheet são armazenados em um drive externo. O arquivo Google Sheet deve estar com a opção de compartilhamento que possibilite qualquer pessoa com o link da planilha realizar leitura;
    - Uma tabela Externa do Bigquey é criada baseada nos arquivos Google Sheet compartilhado. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa baseada no Google Sheet antes de carregá-los no BigQuery.
+   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa baseada no Google Sheet antes de carregá-los no BigQuery.
 
 - Tabela de um Banco de dados: 
    - Os arquivos Parquets contendo dados de uma tabela de banco de dados são enviados para um bucket do GCS via interface, sempre que necessário é possivel incluir novos arquivos;
    - Uma tabela Externa do Bigquey é criada baseada nos arquivos contidos no bucket. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa antes de carregá-los no BigQuery na camada prep que será disponibilizada para conultas.
+   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa antes de carregá-los no BigQuery na camada prep que será disponibilizada para conultas.
 
 ## Instruções de Configurações
 **Pré-requisitos**
@@ -56,7 +56,7 @@ Vizando construir uma solução simples e robusta,iremos utilizar os recursos do
 - Crie o segredo GOOGLE_CREDENTIALS no GitHub: O próximo passo é usar a chave de credenciais JSON da conta de serviço e criar um segredo chamado GOOGLE_CREDENTIALS no seu projeto GitHub.
 ![alt text](documentacao/imagem%205.PNG)
 
-- Configurando o Terraform: Para criar arquivos terraform você pode clonar o repositorio em sua maquina através de uma conexão SSH e editar e criar arquivos .tf (arquivos terraform) usando uma IDE como o Vicual Conde. Recomenda-se criar um arquivo tf para cada recurso a ser criado na nuvem. Para este projeto foram criados os seguintes arquivos(para ver as configurações e recursos criada em cada arquivo, visite-os no repositorio):
+- Configurando o Terraform: Para criar arquivos terraform você pode clonar o repositorio em sua maquina através de uma conexão SSH e editar e criar arquivos .tf (arquivos terraform) usando uma IDE como o Visual Code. Recomenda-se criar um arquivo tf para cada recurso a ser criado na nuvem. Para este projeto foram criados os seguintes arquivos(para ver as configurações e recursos criada em cada arquivo detelhadamente, visite-os no repositório):
    - bigquery.tf: Gerenciar recursos do BigQuery.
    - buckets.tf: Gerenciar buckets de armazenamento.
    - dataproc.tf: Gerenciar recursos do Dataproc.
@@ -64,7 +64,7 @@ Vizando construir uma solução simples e robusta,iremos utilizar os recursos do
    - scheduler.tf:Gerenciar recursos do Cloud Scheduler.
    - variables.tf: Definir variáveis usadas ao longo das configurações do Terraform. É possivel integrar váriaveis de repositório no projeto GitHUb com fluxo de trabalhos do terraform. Por exemplo, tendo essas variáveis ​​declaradas no projeto GitHub é possível usá-las como valores para variáveis ​​do Terraform. Por padrão, o GitHub Workflow procura um arquivo variables.tf para saber sobre valores para preencher as variáveis. 
    ![alt text](documentacao/imagem%206.PNG)
-- Configuração final do Workflow: Tendo a GOOGLE_CREDENTIALS criada e também as variaveis, é hora de usa-los no nosos arquivo workflow.yml. No final ele terá as seguintes configurações:
+- Configuração final do Workflow: Tendo a GOOGLE_CREDENTIALS criada e também as variáveis, é hora de usa-los no nosos arquivo workflow.yml. No final ele terá as seguintes configurações:
 ```ruby
 # This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
 # with an API token for Terraform Cloud (app.terraform.io). On pull request events, this workflow will run
@@ -180,10 +180,10 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 ```
 
-Após criar todos os recursos e configurações nos arquivos Terraform, faça os push no github e observe os recusrso sendo criado no GCP. Use os seguintes comandos:
+Após criar todos os recursos e configurações nos arquivos Terraform, faça o push no github e observe os recursos sendo criado no GCP. Use os seguintes comandos:
 ```
 git add .
-git commit -m "Comentario desejado"
+git commit -m "Comentário desejado"
 git push
 ```
 Observe as actions criadas no git hub: 
@@ -191,7 +191,8 @@ Observe as actions criadas no git hub:
 Caso a action fique verde é sinal de que foi executado a criação/alteração dos recursos, e pode-se observar-los no GCP.
 
 ## Oportunidade de Melhorias
-- Implementação de arquitetura padrão de mercado: Dada a necessidade do case, a arquitetura implementada é simples. Pórem, se tratando de uma volumentria de dados grande, com necessidade especificas, deve-se adotar arquiteturas robustas e escalaveis, como exemplo a arquitetura Medalhão que conta com 3 camadas que representam etapas distintas do processamento dos dados.
+- Implementação de arquitetura padrão de mercado: Dada a necessidade do case, a arquitetura implementada é simples. Pórem, se tratando de uma volumetria de dados grande, com necessidades especificas, deve-se adotar arquiteturas robustas e escaláveis, como exemplo a arquitetura Medalhão que conta com 3 camadas que representam etapas distintas do processamento dos dados.
 - Evitar utilizar Tabelas Externas como fonte de dados: Tabelas externas devem ser evitadas quando ha necessidade de grande performance (volume grande de dados), baixo custo, e que sejam necessario executar comando DML.
-- ETL dos dados: Para esse projeto não houve necessidade de realizar transformações de dados, apenas extração e carregamento. Mas em projetos reais é inprescritivel a utilização de de etapas de transformação dos dados, em especial visando garantir a qualidade dasd informações contidas nos dados.
+- ETL dos dados: Para esse projeto não houve necessidade de realizar transformações de dados, apenas extração e carregamento. Mas em projetos reais é imprescritível a utilização de etapas de transformação dos dados, em especial visando garantir a qualidade das informações contidas nos dados.
 - Módulos Reutilizáveis: É possivel criar módulos Terraform para reutilizar configurações comuns em vários projetos, facilitando padronização e manutenção. Desta forma caso seja implementado a utilização do terraform em novos projetos, deve-se usar desse artificio para facilitar a criação destes.
+- Reestruturação de ambiente de desenvolvimento: No projeto atual, há apenas uma ambiente de desenvolvimento. Visando uma solução robusta deve-se adotar no minimo dois ambiente (dev e prod) garantindo assim que todos os testes sejam feitos e validados em um ambiente não produtivo.
