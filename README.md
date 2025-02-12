@@ -187,5 +187,11 @@ git commit -m "Comentario desejado"
 git push
 ```
 Observe as actions criadas no git hub: 
-![alt text](documentacao/imagem%207.PNG). 
+![alt text](documentacao/imagem%207.PNG) 
 Caso a action fique verde é sinal de que foi executado a criação/alteração dos recursos, e pode-se observar-los no GCP.
+
+## Oportunidade de Melhorias
+- Implementação de arquitetura padrão de mercado: Dada a necessidade do case, a arquitetura implementada é simples. Pórem, se tratando de uma volumentria de dados grande, com necessidade especificas, deve-se adotar arquiteturas robustas e escalaveis, como exemplo a arquitetura Medalhão que conta com 3 camadas que representam etapas distintas do processamento dos dados.
+- Evitar utilizar Tabelas Externas como fonte de dados: Tabelas externas devem ser evitadas quando ha necessidade de grande performance (volume grande de dados), baixo custo, e que sejam necessario executar comando DML.
+- ETL dos dados: Para esse projeto não houve necessidade de realizar transformações de dados, apenas extração e carregamento. Mas em projetos reais é inprescritivel a utilização de de etapas de transformação dos dados, em especial visando garantir a qualidade dasd informações contidas nos dados.
+- Módulos Reutilizáveis: É possivel criar módulos Terraform para reutilizar configurações comuns em vários projetos, facilitando padronização e manutenção. Desta forma caso seja implementado a utilização do terraform em novos projetos, deve-se usar desse artificio para facilitar a criação destes.
