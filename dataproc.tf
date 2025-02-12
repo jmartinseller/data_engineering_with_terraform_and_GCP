@@ -16,7 +16,7 @@ resource "google_storage_bucket_object" "dataproc_jw" {
 
 resource "google_dataproc_workflow_template" "dataproc-jw" {
   name     = "dataproc-daily-execution"
-  location = "us-east1-b"
+  location = "us-east1"
   
   placement {
     managed_cluster {
