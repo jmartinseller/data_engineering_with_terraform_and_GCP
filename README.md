@@ -19,7 +19,7 @@ Visando construir uma solução simples e robusta,utilizaremos os recursos do Go
 - Google Cloud Storage (GCS): Para armazenar os arquivos CSV. A inserção de novos arquivos CSV no bucket deverá ser feita via interface do GCP pelo usúario sempre que necessário. Tambem teremos um bucket para armazenar o arquivo parquet que dá origem a uma tabela no Bigquey.
 - Google Cloud BigQuery: Usado para o armazenamento centralizado dos dados e realização de consultas SQL nesses dados. Usaremos tambem Tabelas Externas para consultar dados diretamente dos buckets e Google Sheets sem carregá-los inicialmente (camada raw) no armazenamento do Bigquey
 - Google Cloud Dataproc: Usado para executar jobs PySpark para extrair, tranformar e carregar os dados no BigQuery. Serão 4 Jobs, cada um responsável por executar o processo em cada tabela.
-- Google Cloud Scheduler: Será usado para agendar a execução dos Jobs pelo Dataproc.
+- Google Cloud Scheduler: Será usado para agendar a execução dos Jobs todo dia as 03:00 Horas pelo Dataproc.
 
 **Fluxo de dados**
 - Arquivos CSV: 
@@ -29,7 +29,8 @@ Visando construir uma solução simples e robusta,utilizaremos os recursos do Go
 
 - Google Sheet: 
    - Os arquivos do Google Sheet são armazenados em um drive externo. O arquivo Google Sheet deve estar com a opção de compartilhamento que possibilite qualquer pessoa com o link da planilha realizar leitura;
-   - Uma tabela Externa do Bigquey é criada baseada nos arquivos Google Sheet compartilhado. Essa tabela pertencerá a camada raw do pipeline de dados.
+   - O arquivo Google Sheet contem duas abas, cada aba dará origem a uma tabela diferente.
+   - Duas Tabelas Externas do Bigquey são criadas baseada nos arquivos Google Sheet compartilhado contendo as duas abas. Essas tabelas pertencerão a camada raw do pipeline de dados.
    - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao Google Sheet antes de carregá-los no BigQuery na camada prep.
 
 - Tabela de um Banco de dados: 
@@ -43,6 +44,10 @@ Visando construir uma solução simples e robusta,utilizaremos os recursos do Go
 - Um bucket no GCP para armazenar o estado das alterações aplicadas no terraform
 - Um repositorio no GitHub com workflow terraform configurado.
 - Uma conta de serviço do GCP com permissões necessarias para acessar, criar, modificar e excluir os recursos necessários.
+- Para esse projeto temos 3 dependências:
+    - Biblioteca gspread usada para acessas a planilha Google Sheets: Essa biblioteca não é pré-instalada no pyhton, dessa forma é necessario que em um bucket tenhamos os pacotes necessários para que ao criar o cluster Dataproc, possa ler e instalar a biblioteca gspread.
+    - Chave de autênticação de uma conta de serviço: Logo abaixo será mostrado como criar essa chave de acesso. Além de ser usada no github, ela tambem estar em um bucket GCP para que seja possivel ser lida e usada na conexão para a biblioteca gspread.
+    - Dependências Spark: Um arquivo .jar contendo os conectores necessarios para que o Spark possa acessar e interagir com o BigQuery. esse arquivo deve estar em algum lugar que o cluster possa vê-lo, como exemplo um bucket.
 
 **Etapas para Implementação**
   - Criação do workflow do Github: Para criar um worflow, acesse a aba Actions no repositório do Github e pesquise por Terraform. Se você não tiver nem workflow configurado, aparecerá a opção de configurar o Terraform. Ao selecionar a opção Configurar Terraform, aparecerá uma janela com um modelo para integração como esse da imagem a seguir !![alt text](documentacao/imagem%202.PNG)
