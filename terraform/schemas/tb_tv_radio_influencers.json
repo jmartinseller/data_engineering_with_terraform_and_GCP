@@ -16,7 +16,7 @@
   },
   {
     "name": "campaign",
-    "type": "INTEGER",
+    "type": "STRING",
     "description": null
   },
   {
