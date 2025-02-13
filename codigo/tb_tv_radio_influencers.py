@@ -1,4 +1,5 @@
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import to_date
 
 # Criação da SparkSession
 spark = SparkSession.builder \
@@ -16,6 +17,8 @@ raw_df = spark.read \
     .option("header", "true") \
     .load("gs://tv_radio_influencers_files/*.csv")
 
+# Converter a coluna 'date' para o tipo DATE
+raw_df = raw_df.withColumn("date", to_date(raw_df["date"], "yyyy-MM-dd"))
 
 # Gravando os dados na tabela tb_prep_leads_sales no dataset prep_uncover
 raw_df.write \
