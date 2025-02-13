@@ -3,6 +3,8 @@ from pyspark.sql import SparkSession
 from oauth2client.service_account import ServiceAccountCredentials
 from google.cloud import storage
 import os
+from pyspark.sql.functions import to_date
+from pyspark.sql.functions import col
 
 # Configurações do Google Sheets
 SHEET_URL = 'https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0'
@@ -51,6 +53,8 @@ headers = [header.strip().replace(" ", "_") for header in headers]
 
 # Cria o DataFrame
 df = spark.createDataFrame(rows, schema=headers)
+df = df.withColumn("date", to_date(df["Date"], "yyyy-MM-dd"))
+df = df.withColumn("Count", df["Count"].cast("int"))
 
 # Gravando os dados na tabela do BigQuery
 df.write \
