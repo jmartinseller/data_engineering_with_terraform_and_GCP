@@ -198,7 +198,7 @@ Take a look at the actions created in the git hub:
 If the action turns green, the resources have been created/changed and can be seen in the GCP.
 
 ## Opportunity for Improvement
-- Implementation of market-standard architecture: Given the needs of the case, the architecture implemented is simple. However, when dealing with a large volume of data, with specific needs, robust and scalable architectures should be adopted, such as the Medallion architecture, which has 3 layers representing different stages of data processing.
+- Implementation of medallion architecture: Given the needs of the case, the architecture implemented is simple. However, when dealing with a large volume of data, with specific needs, robust and scalable architectures should be adopted, such as the Medallion architecture, which has 3 layers representing different stages of data processing.
 - Avoid using external tables as a data source: External tables should be avoided when there is a need for high performance (large volumes of data), low cost, and the need to execute DML commands.
 - Data ETL: For this project there was no need to perform data transformations, only extraction and loading. However, in real projects, the use of data transformation steps is essential, especially in order to guarantee the quality of the information contained in the data.
 - Reusable modules: It is possible to create Terraform modules to reuse common configurations in various projects, facilitating standardization and maintenance. Therefore, if terraform is implemented in new projects, it should be used to facilitate their creation.
