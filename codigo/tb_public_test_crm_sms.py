@@ -1,5 +1,6 @@
 import gspread
 from pyspark.sql import SparkSession
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Configurações do Google Sheets
 SHEET_URL = 'https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0'
@@ -13,36 +14,43 @@ spark = SparkSession.builder \
 
 # Configuração do BigQuery
 spark.conf.set("spark.sql.catalog.spark_bigquery", "org.apache.spark.sql.execution.datasources.v2.bigquery.BigQueryCatalog")
-spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")  # Seu projeto no Google Cloud
+spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314") 
 
-try:
-    # Abre a planilha pública
-    sheet = gspread.open_by_key(SHEET_URL).worksheet(SHEET_NAME)
+scope = [
+    'https://spreadsheets.google.com/feeds',
+    'https://www.googleapis.com/auth/drive'
+]
 
-    # Lê os dados da planilha
-    data = sheet.get_all_values()
+# Carrega as credenciais do arquivo JSON
+creds = ServiceAccountCredentials.from_json_keyfile_name('gs://dependencia_pyspark/key.json', scope)
 
-    # Converte os dados para um DataFrame do PySpark
-    headers = data[0] 
-    rows = data[1:]
+# Autentica o cliente
+client = gspread.authorize(creds)
 
-    # Remove espaços e caracteres especiais dos cabeçalhos
-    headers = [header.strip().replace(" ", "_") for header in headers]
+# Abre a planilha pública
+sheet = client.open_by_url(SHEET_URL).worksheet(SHEET_NAME)
 
-    # Cria o DataFrame
-    df = spark.createDataFrame(rows, schema=headers)
+# Lê os dados da planilha
+data = sheet.get_all_values()
 
-    # Gravando os dados na tabela do BigQuery
-    df.write \
-        .format("bigquery") \
-        .option("table", "prep_uncover.tb_prep_public_test_crm_sms") \
-        .option("temporaryGcsBucket", "tmp_dataproc_jw") \
-        .mode("overwrite") \
-        .save()
-except Exception as e:
-    print(f"Erro ao processar a planilha: {e}")
+# Converte os dados para um DataFrame do PySpark
+headers = data[0] 
+rows = data[1:]
 
+# Remove espaços e caracteres especiais dos cabeçalhos
+headers = [header.strip().replace(" ", "_") for header in headers]
+
+# Cria o DataFrame
+df = spark.createDataFrame(rows, schema=headers)
+
+# Gravando os dados na tabela do BigQuery
+df.write \
+    .format("bigquery") \
+    .option("table", "prep_uncover.tb_prep_public_test_crm_sms") \
+    .option("temporaryGcsBucket", "tmp_dataproc_jw") \
+    .mode("overwrite") \
+    .save()
 
 # Finaliza a SparkSession
-finally:
-    spark.stop()
+
+spark.stop()
