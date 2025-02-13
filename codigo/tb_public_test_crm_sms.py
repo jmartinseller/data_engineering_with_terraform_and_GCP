@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 
 # Configurações do Google Sheets
 SHEET_URL = 'https://docs.google.com/spreadsheets/d/1a7oLWioF0vzcpuSCbpNjtSvPxyf5HHV5UZCn2f7nQvk/edit?gid=0'
-SHEET_NAME = 'Página1'
+SHEET_NAME = 'sms'
 
 # Criação da SparkSession
 spark = SparkSession.builder \
@@ -17,7 +17,7 @@ spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")
 
 try:
     # Abre a planilha pública
-    sheet = gspread.open_by_url(SHEET_URL).worksheet(SHEET_NAME)
+    sheet = gspread.open_by_key(SHEET_URL).worksheet(SHEET_NAME)
 
     # Lê os dados da planilha
     data = sheet.get_all_values()
