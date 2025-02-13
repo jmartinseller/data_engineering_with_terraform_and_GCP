@@ -13,7 +13,7 @@ spark = SparkSession.builder \
 
 # Configuração do BigQuery
 spark.conf.set("spark.sql.catalog.spark_bigquery", "org.apache.spark.sql.execution.datasources.v2.bigquery.BigQueryCatalog")
-spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314")  # Seu projeto no Google Cloud
+spark.conf.set("spark.sql.catalog.spark_bigquery.project", "aprendizado-450314") 
 
 try:
     # Abre a planilha pública
@@ -23,8 +23,8 @@ try:
     data = sheet.get_all_values()
 
     # Converte os dados para um DataFrame do PySpark
-    headers = data[0]  # A primeira linha contém os cabeçalhos
-    rows = data[1:]    # As demais linhas contêm os dados
+    headers = data[0] 
+    rows = data[1:]
 
     # Remove espaços e caracteres especiais dos cabeçalhos
     headers = [header.strip().replace(" ", "_") for header in headers]

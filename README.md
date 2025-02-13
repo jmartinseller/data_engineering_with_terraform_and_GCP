@@ -25,17 +25,17 @@ Visando construir uma solução simples e robusta,utilizaremos os recursos do Go
 - Arquivos CSV: 
    - Os arquivos CSV são enviados para um bucket do GCS via interface; sempre que necessário, é possivel incluir novos arquivos.
    - Uma tabela Externa do Bigquey é criada baseada nos arquivos contidos no bucket. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa antes de carregá-los no BigQuery.
+   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao bucket antes de carregá-los no BigQuery na camada prep.
 
 - Google Sheet: 
    - Os arquivos do Google Sheet são armazenados em um drive externo. O arquivo Google Sheet deve estar com a opção de compartilhamento que possibilite qualquer pessoa com o link da planilha realizar leitura;
    - Uma tabela Externa do Bigquey é criada baseada nos arquivos Google Sheet compartilhado. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa baseada no Google Sheet antes de carregá-los no BigQuery.
+   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao Google Sheet antes de carregá-los no BigQuery na camada prep.
 
 - Tabela de um Banco de dados: 
    - Os arquivos Parquets contendo dados de uma tabela de banco de dados são enviados para um bucket do GCS via interface, sempre que necessário é possivel incluir novos arquivos;
    - Uma tabela Externa do Bigquey é criada baseada nos arquivos contidos no bucket. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta à Tabela Externa antes de carregá-los no BigQuery na camada prep que será disponibilizada para conultas.
+   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao bucket onde está armazenado o arquivo parquet, antes de carregá-los no BigQuery na camada prep que será disponibilizada para conultas.
 
 ## Instruções de Configurações
 **Pré-requisitos**
@@ -196,3 +196,4 @@ Caso a action fique verde é sinal de que foi executado a criação/alteração 
 - ETL dos dados: Para esse projeto não houve necessidade de realizar transformações de dados, apenas extração e carregamento. Mas em projetos reais é imprescritível a utilização de etapas de transformação dos dados, em especial visando garantir a qualidade das informações contidas nos dados.
 - Módulos Reutilizáveis: É possivel criar módulos Terraform para reutilizar configurações comuns em vários projetos, facilitando padronização e manutenção. Desta forma caso seja implementado a utilização do terraform em novos projetos, deve-se usar desse artificio para facilitar a criação destes.
 - Reestruturação de ambiente de desenvolvimento: No projeto atual, há apenas uma ambiente de desenvolvimento. Visando uma solução robusta deve-se adotar no minimo dois ambiente (dev e prod) garantindo assim que todos os testes sejam feitos e validados em um ambiente não produtivo.
+- Utilização de Cloud Functions: Usar cloud functions para consultar a Google Sheet e armazenar os dados em um bucket, evitando assim utilização de API que são lentas.

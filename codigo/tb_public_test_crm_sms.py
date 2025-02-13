@@ -23,8 +23,8 @@ try:
     data = sheet.get_all_values()
 
     # Converte os dados para um DataFrame do PySpark
-    headers = data[0]  # A primeira linha contém os cabeçalhos
-    rows = data[1:]    # As demais linhas contêm os dados
+    headers = data[0] 
+    rows = data[1:]
 
     # Remove espaços e caracteres especiais dos cabeçalhos
     headers = [header.strip().replace(" ", "_") for header in headers]
@@ -35,7 +35,7 @@ try:
     # Gravando os dados na tabela do BigQuery
     df.write \
         .format("bigquery") \
-        .option("table", "prep_uncover.tb_prep_public_test_crm_email") \
+        .option("table", "prep_uncover.tb_prep_public_test_crm_sms") \
         .option("temporaryGcsBucket", "tmp_dataproc_jw") \
         .mode("overwrite") \
         .save()
