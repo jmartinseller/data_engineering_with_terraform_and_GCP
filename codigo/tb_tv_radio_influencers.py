@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import to_date
+from pyspark.sql.functions import col
 
 # Criação da SparkSession
 spark = SparkSession.builder \
@@ -19,6 +20,7 @@ raw_df = spark.read \
 
 # Converter a coluna 'date' para o tipo DATE
 raw_df = raw_df.withColumn("date", to_date(raw_df["date"], "yyyy-MM-dd"))
+raw_df = raw_df.withColumn("spent", col("spent").cast("float"))
 
 # Gravando os dados na tabela tb_prep_leads_sales no dataset prep_uncover
 raw_df.write \
