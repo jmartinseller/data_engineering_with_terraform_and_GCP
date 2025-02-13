@@ -1,75 +1,77 @@
-# Case Tecnico Uncover - Usando Terraform Para Criar Pipeline de Dados no GCP
+# Technical Case: Uncover - Using Terraform to Create a Data Pipeline in GCP
 
-## Visão Geral
-Este projeto consiste em centralizar os dados de 3 fontes diferentes em um ambiente de armazenamento que possibilite consultar os dados de maneira simples e seja possivel usa-los como fonte para análises de dados e algoritmos de machine learning.
+## Overview
+This project consists of centralizing data from 3 different sources in a storage environment that makes it possible to query the data easily and use it as a source for data analysis and machine learning algorithms.
 
-**Origem dos Dados**
-- Uma tabela de banco de dados
-- Arquivos CSV
-- Planilhas do Google Sheets
+**Data Source**
+- A database table
+- CSV files
+- Google Sheets
 
-## Arquitetura da Solução
-Visando construir uma solução simples e robusta,utilizaremos os recursos do Google Cloud Platform (GCP). Essa escolha se deve ao fato de que o GCP conta com dezenas de recursos que possibilitam criar um pipeline de dados simples, robusto e escalável. Todo o provisionamento e gerenciamento da infraestrutura no GCP será realizada via Terraform. Integrando o Terraform ao GitHub, teremos um projeto com criação de recursos de forma automatizada, versionável, com redução do trabalho manual e a possibilidade de fazer rollback de versões anteriores do projeto caso necessario.
+## Solution Architecture
+In order to build a simple and robust solution, we will use the resources of the Google Cloud Platform (GCP). This choice is due to the fact that GCP has dozens of features that make it possible to create a simple, robust and scalable data pipeline. All the provisioning and management of the GCP infrastructure will be carried out via Terraform. By integrating Terraform with GitHub, we will have a project with automated, versionable resource creation, reduced manual work and the possibility of rolling back previous versions of the project if necessary.
 
-**Desenho da Solução**
+**Solution Design**
 ![alt text](documentacao/Arquiteura_Projeto_Uncover.drawio.png)
 
-**Principais Componentes**
+**Main Components**
 
-- Google Cloud Storage (GCS): Para armazenar os arquivos CSV. A inserção de novos arquivos CSV no bucket deverá ser feita via interface do GCP pelo usúario sempre que necessário. Tambem teremos um bucket para armazenar o arquivo parquet que dá origem a uma tabela no Bigquey.
-- Google Cloud BigQuery: Usado para o armazenamento centralizado dos dados e realização de consultas SQL nesses dados. Usaremos tambem Tabelas Externas para consultar dados diretamente dos buckets e Google Sheets sem carregá-los inicialmente (camada raw) no armazenamento do Bigquey
-- Google Cloud Dataproc: Usado para executar jobs PySpark para extrair, tranformar e carregar os dados no BigQuery. Serão 4 Jobs, cada um responsável por executar o processo em cada tabela.
-- Google Cloud Scheduler: Será usado para agendar a execução dos Jobs todo dia as 03:00 Horas pelo Dataproc.
+- Google Cloud Storage (GCS): To store CSV files. New CSV files will have to be added to the bucket via the GCP interface by the user whenever necessary. We will also have a bucket to store the parquet file that gives rise to a table in Bigquey.
+- Google Cloud BigQuery: Used for centralized data storage and performing SQL queries on this data. We will also use External Tables to query data directly from buckets and Google Sheets without initially loading it (raw layer) into Bigquey's storage.
+- Google Cloud Dataproc: Used to run PySpark jobs to extract, transform and load the data into BigQuery. There will be 4 jobs, each responsible for carrying out the process on each table.
+- Google Cloud Scheduler: Will be used to schedule the execution of Jobs every day at 03:00 Hours by Dataproc.
 
-**Fluxo de dados**
-- Arquivos CSV: 
-   - Os arquivos CSV são enviados para um bucket do GCS via interface; sempre que necessário, é possivel incluir novos arquivos.
-   - Uma tabela Externa do Bigquey é criada baseada nos arquivos contidos no bucket. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao bucket antes de carregá-los no BigQuery na camada prep.
+**Data flow**
+- CSV files: 
+   - CSV files are sent to a GCS bucket via the interface; new files can be added whenever necessary.
+   - An external Bigquey table is created based on the files in the bucket. This table will belong to the raw layer of the data pipeline.
+   - The Cloud Scheduler triggers Dataproc jobs on a daily basis, which use PySpark to process the data obtained in a query to the bucket before loading it into BigQuery in the prep layer.
 
 - Google Sheet: 
-   - Os arquivos do Google Sheet são armazenados em um drive externo. O arquivo Google Sheet deve estar com a opção de compartilhamento que possibilite qualquer pessoa com o link da planilha realizar leitura;
-   - O arquivo Google Sheet contem duas abas, cada aba dará origem a uma tabela diferente.
-   - Duas Tabelas Externas do Bigquey são criadas baseada nos arquivos Google Sheet compartilhado contendo as duas abas. Essas tabelas pertencerão a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao Google Sheet antes de carregá-los no BigQuery na camada prep.
+   - Google Sheet files are stored on an external drive. The Google Sheet file must have a sharing option that allows anyone with the spreadsheet link to read it;
+   - The Google Sheet file contains two tabs, each tab will give rise to a different table.
+   - Two Bigquey External Tables are created based on the shared Google Sheet files containing the two tabs. These tables will belong to the raw layer of the data pipeline.
+   - The Cloud Scheduler triggers Dataproc jobs on a daily basis, which use PySpark to process the data obtained from a Google Sheet query before loading it into BigQuery in the prep layer.
 
-- Tabela de um Banco de dados: 
-   - Os arquivos Parquets contendo dados de uma tabela de banco de dados são enviados para um bucket do GCS via interface, sempre que necessário é possivel incluir novos arquivos;
-   - Uma tabela Externa do Bigquey é criada baseada nos arquivos contidos no bucket. Essa tabela pertencerá a camada raw do pipeline de dados.
-   - O Cloud Scheduler aciona jobs do Dataproc diariamente, que usam o PySpark para processar os dados obtidos em uma consulta ao bucket onde está armazenado o arquivo parquet, antes de carregá-los no BigQuery na camada prep que será disponibilizada para conultas.
+- Database table: 
+   - Parquets files containing data from a database table are sent to a GCS bucket via the interface, new files can be added whenever necessary;
+   - An external Bigquey table is created based on the files in the bucket. This table will belong to the raw layer of the data pipeline.
+   - The Cloud Scheduler triggers Dataproc jobs on a daily basis, which use PySpark to process the data obtained in a query to the bucket where the parquet file is stored, before loading it into BigQuery in the prep layer that will be made available for queries.
 
-## Instruções de Configurações
-**Pré-requisitos**
-- Uma conta no GCP e um projeto configurado com os serviçoes necessários habilitados
-- Um bucket no GCP para armazenar o estado das alterações aplicadas no terraform
-- Um repositorio no GitHub com workflow terraform configurado.
-- Uma conta de serviço do GCP com permissões necessarias para acessar, criar, modificar e excluir os recursos necessários.
-- Para esse projeto temos 3 dependências:
-    - Biblioteca gspread usada para acessas a planilha Google Sheets: Essa biblioteca não é pré-instalada no pyhton, dessa forma é necessario que em um bucket tenhamos os pacotes necessários para que ao criar o cluster Dataproc, possa ler e instalar a biblioteca gspread.
-    - Chave de autênticação de uma conta de serviço: Logo abaixo será mostrado como criar essa chave de acesso. Além de ser usada no github, ela tambem estar em um bucket GCP para que seja possivel ser lida e usada na conexão para a biblioteca gspread.
-    - Dependências Spark: Um arquivo .jar contendo os conectores necessarios para que o Spark possa acessar e interagir com o BigQuery. esse arquivo deve estar em algum lugar que o cluster possa vê-lo, como exemplo um bucket.
+## Configuration instructions
+**Prerequisites**
+- A GCP account and a project configured with the necessary services enabled
+- A GCP bucket to store the status of changes applied to the terraform
+- A GitHub repository with terraform workflow configured.
+- A GCP service account with the necessary permissions to access, create, modify and delete the required resources.
+- For this project we have 3 dependencies:
+    - The gspread library used to access the Google Sheets spreadsheet: This library is not pre-installed in pyhton, so it is necessary that in a bucket we have the necessary packages so that when creating the Dataproc cluster, it can read and install the gspread library.
+    - Authentication key for a service account: Below we'll show you how to create this access key. As well as being used on github, it should also be in a GCP bucket so that it can be read and used to connect to the gspread library.
+    - Spark dependencies: A .jar file containing the connectors needed for Spark to access and interact with BigQuery. This file must be somewhere that the cluster can see it, such as a bucket.
 
-**Etapas para Implementação**
-  - Criação do workflow do Github: Para criar um worflow, acesse a aba Actions no repositório do Github e pesquise por Terraform. Se você não tiver nem workflow configurado, aparecerá a opção de configurar o Terraform. Ao selecionar a opção Configurar Terraform, aparecerá uma janela com um modelo para integração como esse da imagem a seguir !![alt text](documentacao/imagem%202.PNG)
+**Implementation Steps**
+- Creating a Github workflow: To create a workflow, go to the Actions tab in the Github repository and search for Terraform. If you don't have a workflow set up, the option to configure Terraform will appear. When you select the Configure Terraform option, a window will appear with an integration template like the one in the following image
+![alt text](documentacao/imagem%202.PNG)
 
-- Criação da Conta de Serviço no GCP: Para o GitHub Terraform Workflow interagir com o Google Cloud, é necessário ter uma conta de serviço do Google. Vamos criar uma no painel IAM. Preencha o formulário com um nome de conta de serviço e clique em continuar. Na função de conta de serviço, você deve dar apenas o acesso necessário para os serviços que criará, mas se estiver em execução, dê acesso de Editor.
+- Creating a GCP Service Account: In order for GitHub Terraform Workflow to interact with Google Cloud, you need to have a Google service account. Let's create one in the IAM panel. Fill in the form with a service account name and click continue. In the service account function, you should only give the necessary access to the services you are going to create, but if they are running, give them Editor access.
 ![alt text](documentacao/imagem%203.PNG)
 
-- Gerar chave JSON para conta de serviço: Na tabela de lista de contas de serviços, acesse a opção Manage Keys na coluna Actions. Depois, crie uma chave JSON para sua Service Account. O navegador pedirá para baixar um arquivo JSON. Baixe-o para usar como uma integração de conta de serviço no GitHub.
+- Generate JSON key for service account: In the list table of service accounts, access the Manage Keys option in the Actions column. Then create a JSON key for your Service Account. The browser will ask you to download a JSON file. Download it to use as a service account integration on GitHub.
 ![alt text](documentacao/imagem%204.PNG)
 
-- Crie o segredo GOOGLE_CREDENTIALS no GitHub: O próximo passo é usar a chave de credenciais JSON da conta de serviço e criar um segredo chamado GOOGLE_CREDENTIALS no seu projeto GitHub.
+- Create the GOOGLE_CREDENTIALS secret on GitHub: The next step is to use the JSON credentials key from the service account and create a secret called GOOGLE_CREDENTIALS in your GitHub project.
 ![alt text](documentacao/imagem%205.PNG)
 
-- Configurando o Terraform: Para criar arquivos terraform você pode clonar o repositorio em sua maquina através de uma conexão SSH e editar e criar arquivos .tf (arquivos terraform) usando uma IDE como o Visual Code. Recomenda-se criar um arquivo tf para cada recurso a ser criado na nuvem. Para este projeto foram criados os seguintes arquivos(para ver as configurações e recursos criada em cada arquivo detelhadamente, visite-os no repositório):
-   - bigquery.tf: Gerenciar recursos do BigQuery.
-   - buckets.tf: Gerenciar buckets de armazenamento.
-   - dataproc.tf: Gerenciar recursos do Dataproc.
-   - main.tf: O arquivo principal de configuração do Terraform, que inclui as definições primárias da infraestrutura e configurações dos recursos
-   - scheduler.tf:Gerenciar recursos do Cloud Scheduler.
-   - variables.tf: Definir variáveis usadas ao longo das configurações do Terraform. É possivel integrar váriaveis de repositório no projeto GitHUb com fluxo de trabalhos do terraform. Por exemplo, tendo essas variáveis ​​declaradas no projeto GitHub é possível usá-las como valores para variáveis ​​do Terraform. Por padrão, o GitHub Workflow procura um arquivo variables.tf para saber sobre valores para preencher as variáveis. 
+- Setting up Terraform: To create terraform files you can clone the repository on your machine via an SSH connection and edit and create .tf files (terraform files) using an IDE such as Visual Code. It is recommended to create a tf file for each resource to be created in the cloud. For this project, the following files were created (to see the configurations and resources created in each file in detail, visit them in the repository):
+   - bigquery.tf: Manage BigQuery resources.
+   - buckets.tf: Manage storage buckets.
+   - dataproc.tf: Manage Dataproc resources.
+   - main.tf: Terraform's main configuration file, which includes the primary infrastructure definitions and resource configurations
+   - scheduler.tf: Manage Cloud Scheduler resources.
+   - variables.tf: Define variables used throughout Terraform's configurations. It is possible to integrate repository variables in the GitHUb project with the Terraform workflow. For example, by having these variables declared in the GitHub project, you can use them as values for Terraform variables. By default, GitHub Workflow looks for a variables.tf file to find out about values to fill in the variables. 
    ![alt text](documentacao/imagem%206.PNG)
-- Configuração final do Workflow: Tendo a GOOGLE_CREDENTIALS criada e também as variáveis, é hora de usa-los no nosos arquivo workflow.yml. No final ele terá as seguintes configurações:
+
+- Final Workflow configuration: Having created GOOGLE_CREDENTIALS and also the variables, it's time to use them in our workflow.yml file. In the end, it will have the following settings:
 ```ruby
 # This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
 # with an API token for Terraform Cloud (app.terraform.io). On pull request events, this workflow will run
@@ -185,20 +187,20 @@ jobs:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 ```
 
-Após criar todos os recursos e configurações nos arquivos Terraform, faça o push no github e observe os recursos sendo criado no GCP. Use os seguintes comandos:
+After creating all the resources and settings in the Terraform files, push them to github and watch the resources being created in GCP. Use the following commands:
 ```
 git add .
 git commit -m "Comentário desejado"
 git push
 ```
-Observe as actions criadas no git hub: 
+Take a look at the actions created in the git hub: 
 ![alt text](documentacao/imagem%207.PNG) 
-Caso a action fique verde é sinal de que foi executado a criação/alteração dos recursos, e pode-se observar-los no GCP.
+If the action turns green, the resources have been created/changed and can be seen in the GCP.
 
-## Oportunidade de Melhorias
-- Implementação de arquitetura padrão de mercado: Dada a necessidade do case, a arquitetura implementada é simples. Pórem, se tratando de uma volumetria de dados grande, com necessidades especificas, deve-se adotar arquiteturas robustas e escaláveis, como exemplo a arquitetura Medalhão que conta com 3 camadas que representam etapas distintas do processamento dos dados.
-- Evitar utilizar Tabelas Externas como fonte de dados: Tabelas externas devem ser evitadas quando ha necessidade de grande performance (volume grande de dados), baixo custo, e que sejam necessario executar comando DML.
-- ETL dos dados: Para esse projeto não houve necessidade de realizar transformações de dados, apenas extração e carregamento. Mas em projetos reais é imprescritível a utilização de etapas de transformação dos dados, em especial visando garantir a qualidade das informações contidas nos dados.
-- Módulos Reutilizáveis: É possivel criar módulos Terraform para reutilizar configurações comuns em vários projetos, facilitando padronização e manutenção. Desta forma caso seja implementado a utilização do terraform em novos projetos, deve-se usar desse artificio para facilitar a criação destes.
-- Reestruturação de ambiente de desenvolvimento: No projeto atual, há apenas uma ambiente de desenvolvimento. Visando uma solução robusta deve-se adotar no minimo dois ambiente (dev e prod) garantindo assim que todos os testes sejam feitos e validados em um ambiente não produtivo.
-- Utilização de Cloud Functions: Usar cloud functions para consultar a Google Sheet e armazenar os dados em um bucket, evitando assim utilização de API que são lentas.
+## Opportunity for Improvement
+- Implementation of market-standard architecture: Given the needs of the case, the architecture implemented is simple. However, when dealing with a large volume of data, with specific needs, robust and scalable architectures should be adopted, such as the Medallion architecture, which has 3 layers representing different stages of data processing.
+- Avoid using external tables as a data source: External tables should be avoided when there is a need for high performance (large volumes of data), low cost, and the need to execute DML commands.
+- Data ETL: For this project there was no need to perform data transformations, only extraction and loading. However, in real projects, the use of data transformation steps is essential, especially in order to guarantee the quality of the information contained in the data.
+- Reusable modules: It is possible to create Terraform modules to reuse common configurations in various projects, facilitating standardization and maintenance. Therefore, if terraform is implemented in new projects, it should be used to facilitate their creation.
+- Restructuring the development environment: In the current project, there is only one development environment. Aiming for a robust solution, a minimum of two environments (dev and prod) should be adopted, thus ensuring that all tests are carried out and validated in a non-productive environment.
+- Use of Cloud Functions: Use cloud functions to query the Google Sheet and store the data in a bucket, thus avoiding the use of APIs, which are slow.
