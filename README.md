@@ -1,4 +1,4 @@
-# Technical Case: Uncover - Using Terraform to Create a Data Pipeline in GCP
+# Using Terraform to Create a Data Pipeline in GCP
 
 ## Overview
 This project consists of centralizing data from 3 different sources in a storage environment that makes it possible to query the data easily and use it as a source for data analysis and machine learning algorithms.
